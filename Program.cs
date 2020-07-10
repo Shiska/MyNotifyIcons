@@ -48,6 +48,7 @@ namespace MyNofityIcons
             this.Icon = Icon.ExtractAssociatedIcon(Application.ExecutablePath);
             this.AutoSize = true;
             this.AutoSizeMode = AutoSizeMode.GrowAndShrink;
+            this.MaximizeBox = false;
 
             this.layout = new TableLayoutPanel();
             this.layout.AutoSize = true;
