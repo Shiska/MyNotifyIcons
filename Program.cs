@@ -244,6 +244,8 @@ namespace MyNofityIcons
 
         [DllImport("User32")]
         private static extern int ShowWindow(int hwnd, int nCmdShow);
+        [DllImport("User32")]
+        public static extern int SetForegroundWindow(int hwnd);
 
         public NofityIconRun(string executable, string arguments = "", int timeout = 5, bool hidden = false)
         {
@@ -270,14 +272,17 @@ namespace MyNofityIcons
                         else
                         {
                             ShowWindow(hWnd, SW_SHOW);
+                            SetForegroundWindow(hWnd);
                         }
                     });
 
                     process.EnableRaisingEvents = true;
                     process.Exited += new EventHandler((sender, e) => { Application.Exit(); });
 
-                    while ((hWnd = (int)process.MainWindowHandle) == 0) ;
-
+                    while ((hWnd = (int)process.MainWindowHandle) == 0)
+                    {
+                        Thread.Yield();
+                    }
                     if (hidden)
                     {
                         ShowWindow(hWnd, SW_HIDE);
