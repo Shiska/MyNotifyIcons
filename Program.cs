@@ -241,11 +241,14 @@ namespace MyNofityIcons
     {
         private const int SW_HIDE = 0;
         private const int SW_SHOW = 5;
+        private const int SW_RESTORE = 9;
 
         [DllImport("User32")]
         private static extern int ShowWindow(int hwnd, int nCmdShow);
         [DllImport("User32")]
-        public static extern int SetForegroundWindow(int hwnd);
+        private static extern int SetForegroundWindow(int hwnd);
+        [DllImport("User32")]
+        private static extern bool IsIconic(int hwnd);
 
         public NofityIconRun(string executable, string arguments = "", int timeout = 5, bool hidden = false)
         {
@@ -271,11 +274,10 @@ namespace MyNofityIcons
                         }
                         else
                         {
-                            ShowWindow(hWnd, SW_SHOW);
+                            ShowWindow(hWnd, IsIconic(hWnd) ? SW_RESTORE : SW_SHOW);
                             SetForegroundWindow(hWnd);
                         }
                     });
-
                     process.EnableRaisingEvents = true;
                     process.Exited += new EventHandler((sender, e) => { Application.Exit(); });
 
