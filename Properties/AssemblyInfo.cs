@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("MyNofityIcons")]
+[assembly: AssemblyTitle("MyNotifyIcons")]
 [assembly: AssemblyDescription("Simple gui to add notify icons for Windows")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("MyNofityIcons")]
+[assembly: AssemblyProduct("MyNotifyIcons")]
 [assembly: AssemblyCopyright("Copyright © Markus Hanel 2020")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]

@@ -6,8 +6,8 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{FD1A8E21-E2BF-46A4-847A-D223445274B6}</ProjectGuid>
     <OutputType>WinExe</OutputType>
-    <RootNamespace>MyNofityIcons</RootNamespace>
-    <AssemblyName>MyNofityIcons</AssemblyName>
+    <RootNamespace>MyNotifyIcons</RootNamespace>
+    <AssemblyName>MyNotifyIcons</AssemblyName>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>

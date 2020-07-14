@@ -10,9 +10,9 @@ using System.Runtime.InteropServices;
 
 using Microsoft.Win32;
 
-namespace MyNofityIcons
+namespace MyNotifyIcons
 {
-    public class MyNofityIcon
+    public class MyNotifyIcon
     {
         [STAThread]
         private static void Main(string[] args)
@@ -22,7 +22,7 @@ namespace MyNofityIcons
                 switch (args[0])
                 {
                     case "--autostart":
-                        foreach (var (executable, _) in MyNofityIconSetting.executable)
+                        foreach (var (executable, _) in MyNotifyIconSetting.executable)
                         {
                             Start(executable);
                         }
@@ -39,7 +39,7 @@ namespace MyNofityIcons
                         return;
                 }
             }
-            Application.Run(new MyNofityIconForm());
+            Application.Run(new MyNotifyIconForm());
         }
 
         [DllImport("User32")]
@@ -64,7 +64,7 @@ namespace MyNofityIcons
         {
             NotifyIcon icon = new NotifyIcon();
 
-            icon.Text = Path.ChangeExtension(executable, null);
+            icon.Text = Path.ChangeExtension(Path.GetFileName(executable), null);
             icon.Visible = true;
 
             if (File.Exists(executable))
@@ -170,14 +170,14 @@ namespace MyNofityIcons
         }
     }
 
-    public class MyNofityIconForm : Form
+    public class MyNotifyIconForm : Form
     {
         private TableLayoutPanel layout;
         private Button addButton;
 
-        public MyNofityIconForm()
+        public MyNotifyIconForm()
         {
-            this.Text = "MyNofityIcons";
+            this.Text = "MyNotifyIcons";
             this.Icon = Icon.ExtractAssociatedIcon(Application.ExecutablePath);
             this.AutoSize = true;
             this.AutoSizeMode = AutoSizeMode.GrowAndShrink;
@@ -199,10 +199,10 @@ namespace MyNofityIcons
 
             autostartCB.AutoSize = true;
             autostartCB.Text = "Autostart with Microsoft Windows";
-            autostartCB.Checked = MyNofityIconSetting.autostart;
+            autostartCB.Checked = MyNotifyIconSetting.autostart;
             autostartCB.Anchor = AnchorStyles.Left;
             autostartCB.CheckedChanged += new EventHandler((sender, e) => {
-                MyNofityIconSetting.autostart = autostartCB.Checked;
+                MyNotifyIconSetting.autostart = autostartCB.Checked;
             });
 
             this.addButton = new Button();
@@ -220,7 +220,7 @@ namespace MyNofityIcons
 
             this.Controls.Add(this.layout);
 
-            foreach (var (executale, autostart) in MyNofityIconSetting.executable)
+            foreach (var (executale, autostart) in MyNotifyIconSetting.executable)
             {
                 AddRow(executale, autostart);
             }
@@ -234,7 +234,7 @@ namespace MyNofityIcons
 
                 if (openFileDialog.ShowDialog() == DialogResult.OK)
                 {
-                    if (MyNofityIconSetting.isInExecutable(openFileDialog.FileName) == false)
+                    if (MyNotifyIconSetting.isInExecutable(openFileDialog.FileName) == false)
                     {
                         AddRow(openFileDialog.FileName, false);
 
@@ -268,7 +268,7 @@ namespace MyNofityIcons
             runButton.Text = "Run";
             runButton.Anchor = AnchorStyles.Left;
             runButton.Click += new EventHandler((sender, e) => {
-                MyNofityIcon.Start(path, hidden: false);
+                MyNotifyIcon.Start(path, hidden: false);
             });
 
             Button remButton = new Button();
@@ -314,13 +314,13 @@ namespace MyNofityIcons
             }
             executable.Reverse();
 
-            MyNofityIconSetting.executable = executable;
+            MyNotifyIconSetting.executable = executable;
         }
     }
 
-    public class MyNofityIconSetting
+    public class MyNotifyIconSetting
     {
-        const string key = "MyNofityIconAutostart";
+        const string key = "MyNotifyIconAutostart";
 
         public static bool autostart
         {

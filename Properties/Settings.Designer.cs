@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace MyNofityIcons.Properties {
+namespace MyNotifyIcons.Properties {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
