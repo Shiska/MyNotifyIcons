@@ -15,7 +15,7 @@ namespace MyNofityIcons
     public class MyNofityIcon
     {
         [STAThread]
-        static void Main(string[] args)
+        private static void Main(string[] args)
         {
             if (args.Length != 0)
             {
@@ -36,19 +36,21 @@ namespace MyNofityIcons
             Application.Run(new MyNofityIconForm());
         }
 
-        private const int SW_HIDE = 0;
-        private const int SW_SHOW = 5;
-        private const int SW_RESTORE = 9;
-
         [DllImport("User32")]
-        private static extern int ShowWindow(int hwnd, int nCmdShow);
+        private static extern int ShowWindow(IntPtr hwnd, nCmdShow nCmdShow);
+        private enum nCmdShow : int
+        {
+            SW_HIDE = 0,
+            SW_SHOW = 5,
+            SW_RESTORE = 9,
+        }
         [DllImport("User32")]
-        private static extern int SetForegroundWindow(int hwnd);
+        private static extern int SetForegroundWindow(IntPtr hwnd);
         [DllImport("User32")]
-        private static extern bool IsIconic(int hwnd);
+        private static extern bool IsIconic(IntPtr hwnd);
         [DllImport("User32")]
         private static extern bool EnumWindows(EnumWindowsProc enumProc, IntPtr lParam);
-        public delegate bool EnumWindowsProc(IntPtr hWnd, IntPtr lParam);
+        private delegate bool EnumWindowsProc(IntPtr hWnd, IntPtr lParam);
         [DllImport("User32")]
         private static extern uint GetWindowThreadProcessId(IntPtr hWnd, out int ProcessId);
 
@@ -73,16 +75,16 @@ namespace MyNofityIcons
 
                 if (process != null)
                 {
-                    int hWnd = 0;
+                    IntPtr hWnd = IntPtr.Zero;
 
                     icon.MouseDoubleClick += new MouseEventHandler((sender, e) => {
                         if ((hidden = !hidden))
                         {
-                            ShowWindow(hWnd, SW_HIDE);
+                            ShowWindow(hWnd, nCmdShow.SW_HIDE);
                         }
                         else
                         {
-                            ShowWindow(hWnd, IsIconic(hWnd) ? SW_RESTORE : SW_SHOW);
+                            ShowWindow(hWnd, IsIconic(hWnd) ? nCmdShow.SW_RESTORE : nCmdShow.SW_SHOW);
                             SetForegroundWindow(hWnd);
                         }
                     });
@@ -91,17 +93,20 @@ namespace MyNofityIcons
 
                     if (hidden)
                     {
-                        while ((hWnd = (int)GetHwnd(process.Id)) == 0)
+                        do
                         {
                             Thread.Yield();
                         }
+                        while ((hWnd = GetHwnd(process.Id)) == IntPtr.Zero) ;
                     }
                     else
                     {
-                        while ((hWnd = (int)process.MainWindowHandle) == 0)
+                        do
                         {
                             Thread.Yield();
+                            process.Refresh();
                         }
+                        while ((hWnd = process.MainWindowHandle) == IntPtr.Zero);
                     }
                     Application.Run();
                 }
