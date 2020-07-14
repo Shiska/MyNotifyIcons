@@ -24,12 +24,18 @@ namespace MyNofityIcons
                     case "--autostart":
                         foreach (var (executable, _) in MyNofityIconSetting.executable)
                         {
-                            Start(executable, true);
+                            Start(executable);
                         }
                         return;
                     case "--start":
-                        Run(args[1], hidden: Boolean.Parse(args[2]));
-
+                        if (args.Length == 2)
+                        {
+                            Run(args[1]);
+                        }
+                        else
+                        {
+                            Run(args[1], args.Skip(2).Take(args.Length - 3).ToArray(), Boolean.Parse(args[args.Length - 1]));
+                        }
                         return;
                 }
             }
@@ -54,7 +60,7 @@ namespace MyNofityIcons
         [DllImport("User32")]
         private static extern uint GetWindowThreadProcessId(IntPtr hWnd, out int ProcessId);
 
-        public static void Run(string executable, string arguments = "", int timeout = 5, bool hidden = false)
+        public static void Run(string executable, string[] args = null, bool hidden = true, int timeout = 5)
         {
             NotifyIcon icon = new NotifyIcon();
 
@@ -65,8 +71,12 @@ namespace MyNofityIcons
             {
                 icon.Icon = Icon.ExtractAssociatedIcon(executable);
 
-                ProcessStartInfo startInfo = new ProcessStartInfo(executable, arguments);
+                ProcessStartInfo startInfo = new ProcessStartInfo(executable);
 
+                if (args != null && args.Length != 0)
+                {
+                    startInfo.Arguments = "\"" + String.Join("\" \"", args) + "\"";
+                }
                 if (hidden)
                 {
                     startInfo.WindowStyle = ProcessWindowStyle.Hidden;
@@ -146,9 +156,17 @@ namespace MyNofityIcons
             return hwnd;
         }
 
-        public static Process Start(string executable, bool hidden)
+        public static Process Start(string executable, string[] args = null, bool hidden = true)
         {
-            return Process.Start(Application.ExecutablePath, "--start \"" + executable + "\" " + hidden.ToString());
+            List<string> pargs = new List<string> { executable };
+
+            if (args != null)
+            {
+                pargs.AddRange(args);
+            }
+            pargs.Add(hidden.ToString());
+
+            return Process.Start(Application.ExecutablePath, "--start \"" + String.Join("\" \"", pargs) + "\"");
         }
     }
 
@@ -250,7 +268,7 @@ namespace MyNofityIcons
             runButton.Text = "Run";
             runButton.Anchor = AnchorStyles.Left;
             runButton.Click += new EventHandler((sender, e) => {
-                MyNofityIcon.Start(path, false);
+                MyNofityIcon.Start(path, hidden: false);
             });
 
             Button remButton = new Button();

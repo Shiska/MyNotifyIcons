@@ -6,9 +6,11 @@ The GUI can be used to start chosen applications with tray icons and add them to
 
 ## Command line
 
-The GUI just calls itself with the correct parameters to start the applications with a tray icon.
-
+Start the application hidden without arguments.
 ```
-MyNofityIcons.exe --start "path_to_file" hidden_true_false
+MyNofityIcons.exe --start "path_to_file"
 ```
-If hidden is true than the application hides in the tray after startup.
+You can add arguments after the path but then you also need to specify the hidden value as last argument.
+```
+MyNofityIcons.exe --start "path_to_file" arguments hidden_true_false
+```
