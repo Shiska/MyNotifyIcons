@@ -249,6 +249,11 @@ namespace MyNofityIcons
         private static extern int SetForegroundWindow(int hwnd);
         [DllImport("User32")]
         private static extern bool IsIconic(int hwnd);
+        [DllImport("User32")]
+        private static extern bool EnumWindows(EnumWindowsProc enumProc, IntPtr lParam);
+        public delegate bool EnumWindowsProc(IntPtr hWnd, IntPtr lParam);
+        [DllImport("User32")]
+        private static extern uint GetWindowThreadProcessId(IntPtr hWnd, out int ProcessId);
 
         public NofityIconRun(string executable, string arguments = "", int timeout = 5, bool hidden = false)
         {
@@ -261,7 +266,13 @@ namespace MyNofityIcons
             {
                 icon.Icon = Icon.ExtractAssociatedIcon(executable);
 
-                Process process = Process.Start(executable, arguments);
+                ProcessStartInfo startInfo = new ProcessStartInfo(executable, arguments);
+
+                if (hidden)
+                {
+                    startInfo.WindowStyle = ProcessWindowStyle.Hidden;
+                }
+                Process process = Process.Start(startInfo);
 
                 if (process != null)
                 {
@@ -281,13 +292,19 @@ namespace MyNofityIcons
                     process.EnableRaisingEvents = true;
                     process.Exited += new EventHandler((sender, e) => { Application.Exit(); });
 
-                    while ((hWnd = (int)process.MainWindowHandle) == 0)
-                    {
-                        Thread.Yield();
-                    }
                     if (hidden)
                     {
-                        ShowWindow(hWnd, SW_HIDE);
+                        while ((hWnd = (int)GetHwnd(process.Id)) == 0)
+                        {
+                            Thread.Yield();
+                        }
+                    }
+                    else
+                    {
+                        while ((hWnd = (int)process.MainWindowHandle) == 0)
+                        {
+                            Thread.Yield();
+                        }
                     }
                     Application.Run();
                 }
@@ -304,6 +321,27 @@ namespace MyNofityIcons
 
                 Thread.Sleep(timeout * 1000);
             }
+        }
+
+        public static IntPtr GetHwnd(int processid)
+        {
+            IntPtr hwnd = IntPtr.Zero;
+
+            EnumWindows(delegate (IntPtr wnd, IntPtr param)
+            {
+                int lpdwProcessId;
+
+                GetWindowThreadProcessId(wnd, out lpdwProcessId);
+
+                if (lpdwProcessId == processid)
+                {
+                    hwnd = wnd;
+                    return false;
+                }
+                return true;
+            }, IntPtr.Zero);
+
+            return hwnd;
         }
 
         static private string executablePath = Path.GetFullPath(Application.ExecutablePath);
